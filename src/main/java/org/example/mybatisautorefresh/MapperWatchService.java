@@ -90,7 +90,7 @@ public class MapperWatchService {
                     }
                     poll.reset();
                 } catch (Throwable e) {
-                    e.printStackTrace();
+                    log.error("",e);
                 }
             }
         }, "MapperRefreshThread").start();
