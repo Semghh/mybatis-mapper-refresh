@@ -10,7 +10,7 @@
     </parent>
 
     <groupId>org.semghh</groupId>
-    <artifactId>mybatis-mapper-auto-refresh</artifactId>
+    <artifactId>mapper-refresh-spring-boot-starter</artifactId>
     <version>0.0.1</version>
 
     <name>mybatis-auto-refresh</name>

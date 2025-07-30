@@ -21,8 +21,6 @@ import java.lang.reflect.Field;
  * @date 2025/7/29 11:43
  */
 @Slf4j
-@Configuration
-@ConditionalOnProperty(value = "mybatis-mapper-auto-refresh.enable", havingValue = "true")
 public class MapperAutoRefreshPostProcessor implements BeanPostProcessor, SqlSessionFactoryBeanCustomizer {
 
     MybatisSqlSessionFactoryBean factoryBean;

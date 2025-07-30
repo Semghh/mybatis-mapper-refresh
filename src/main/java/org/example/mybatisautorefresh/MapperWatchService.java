@@ -19,6 +19,7 @@ import java.nio.file.StandardWatchEventKinds;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -37,6 +38,8 @@ public class MapperWatchService {
 
     ConcurrentHashMap<String, Resource> nameResource = new ConcurrentHashMap<>();
 
+    Set<Path> registered = new HashSet<>();
+
     MybatisConfiguration configuration;
 
     public MapperWatchService(MybatisConfiguration configuration) {
@@ -53,9 +56,12 @@ public class MapperWatchService {
         if (watchService == null) {
             createWatchService();
         }
-        path.register(watchServiceAtomicReference.get(), StandardWatchEventKinds.ENTRY_MODIFY);
+        if (!registered.contains(path)){
+            path.register(watchServiceAtomicReference.get(), StandardWatchEventKinds.ENTRY_MODIFY);
+            registered.add(path);
+            log.info("监听路径: [{}]", path);
+        }
         nameResource.putIfAbsent(resource.getFilename(), resource);
-        log.info("监听路径: [{}]", path);
     }
 
     private void createWatchService() throws IOException {
