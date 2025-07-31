@@ -134,6 +134,10 @@ public class MapperWatchService {
         }
         Resource resource = nameResource.get(string);
 
+        if (resource==null){
+            log.info("{}文件发生变动，未注册Mapper,忽略", p);
+            return;
+        }
         log.info("{}文件发生变动，刷新Mapper", resource.getURL());
 
         //获得XML的XNode
