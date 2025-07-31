@@ -11,7 +11,7 @@
 
     <groupId>org.semghh</groupId>
     <artifactId>mapper-refresh-spring-boot-starter</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
 
     <name>mybatis-auto-refresh</name>
     <description>mybatis-mapper-auto-refresh</description>

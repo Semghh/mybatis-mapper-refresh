@@ -9,9 +9,11 @@ import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMap;
 import org.apache.ibatis.parsing.XNode;
 import org.apache.ibatis.parsing.XPathParser;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.xml.sax.SAXParseException;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -56,13 +58,32 @@ public class MapperWatchService {
         if (watchService == null) {
             createWatchService();
         }
-        if (!registered.contains(path)){
-            path.register(watchServiceAtomicReference.get(), StandardWatchEventKinds.ENTRY_MODIFY);
-            registered.add(path);
-            log.info("监听路径: [{}]", path);
+
+        Path registerPath = null;
+        String pathStr = path.toString();
+        int index;
+        if ((index = pathStr.indexOf("target\\classes")) != -1) {
+            Path p = Path.of(pathStr.substring(index + 15));
+            Path srcPath = new File("").getAbsoluteFile().toPath().resolve("src").resolve("main").resolve("resources").resolve(p);
+
+            if (srcPath.toFile().exists()) {
+                registerPath = srcPath;
+            }
         }
-        nameResource.putIfAbsent(resource.getFilename(), resource);
+        if (registerPath == null) {
+            log.info("资源：[{}]无法找到对应的源码路径。", path);
+            return;
+        }
+        resource = new FileSystemResource(registerPath.resolve(resource.getFilename()).toString());
+
+        if (!registered.contains(registerPath)) {
+            registerPath.register(watchServiceAtomicReference.get(), StandardWatchEventKinds.ENTRY_MODIFY);
+            registered.add(registerPath);
+            log.info("监听路径: [{}]", registerPath);
+            nameResource.putIfAbsent(resource.getFilename(), resource);
+        }
     }
+
 
     private void createWatchService() throws IOException {
 
@@ -85,18 +106,18 @@ public class MapperWatchService {
                         if (context instanceof Path p) {
                             try {
                                 refreshMapper(p);
-                            }catch (Throwable e){
-                                if (e.getCause() instanceof SAXParseException){
+                            } catch (Throwable e) {
+                                if (e.getCause() instanceof SAXParseException) {
                                     //ignore
                                     continue;
                                 }
-                                log.error("未知异常",e);
+                                log.error("未知异常", e);
                             }
                         }
                     }
                     poll.reset();
                 } catch (Throwable e) {
-                    log.error("",e);
+                    log.error("", e);
                 }
             }
         }, "MapperRefreshThread").start();
@@ -137,7 +158,7 @@ public class MapperWatchService {
         //移除sqlFragments
         ConcurrentHashMap<String, XNode> sqlFragments = Permit.getObjFromField(MybatisConfiguration.class, "sqlFragments", configuration);
         for (XNode sqlFragment : context.evalNodes("/mapper/sql")) {
-            sqlFragments.remove(namespace+"."+sqlFragment.getStringAttribute("id"));
+            sqlFragments.remove(namespace + "." + sqlFragment.getStringAttribute("id"));
         }
 
 
