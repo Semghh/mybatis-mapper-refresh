@@ -41,10 +41,10 @@ mybatis-mapper-auto-refresh:
 
 ## 使用说明
 
-在开发环境中,mybatis实际使用的是 `${project_home}/target/`路径下的XML文件。
-因此，只有该路径下的XML发生了变动才会监听到。修改`${project_home}/target/`不会被监听。
+在开发环境中,mybatis实际使用的是 `${project_home}/target/`路径下编译后的XML文件资源。
 
-下个版本可能会对这个问题进行改进。
+为了开发方便,我们会通过target下的资源找到对应源码监听。
+因此无需修改`${project_home}/target/`下的XML。
 
 
 
